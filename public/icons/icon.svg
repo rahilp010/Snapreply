@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="bubbleClip">
+      <circle cx="64" cy="64" r="46"/>
+    </clipPath>
+
+    <!-- Subtle Outer Thin-Film Ambient Bloom -->
+    <radialGradient id="outerAura" cx="50%" cy="50%" r="50%">
+      <stop offset="68%" stop-color="#010103" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#fbbf24" stop-opacity="0.14"/>
+      <stop offset="92%" stop-color="#67e8f9" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#040407" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Deep Pitch-Black Hollow Core Mask -->
+    <radialGradient id="voidCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#010103" stop-opacity="1"/>
+      <stop offset="64%" stop-color="#010103" stop-opacity="0.98"/>
+      <stop offset="82%" stop-color="#010103" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#010103" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Right-Side Warm Amber / Tangerine Crescent (1 to 5 o'clock) -->
+    <linearGradient id="amberCrescent" x1="20%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95"/>
+      <stop offset="32%" stop-color="#fbbf24" stop-opacity="0.98"/>
+      <stop offset="68%" stop-color="#f97316" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#c2410c" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Top-Left White -> Cream Gold -> Orchid Thin-Film Arc (10 to 1 o'clock) -->
+    <linearGradient id="topFilm" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.98"/>
+      <stop offset="58%" stop-color="#fef08a" stop-opacity="0.92"/>
+      <stop offset="82%" stop-color="#c084fc" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0.25"/>
+    </linearGradient>
+
+    <!-- Inner Violet-Purple Thin-Film Refraction Band -->
+    <linearGradient id="violetBand" x1="85%" y1="10%" x2="15%" y2="90%">
+      <stop offset="0%" stop-color="#9333ea" stop-opacity="0"/>
+      <stop offset="38%" stop-color="#9333ea" stop-opacity="0.9"/>
+      <stop offset="68%" stop-color="#c084fc" stop-opacity="0.74"/>
+      <stop offset="100%" stop-color="#9333ea" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Bottom-Left Warm Amber & Icy Cyan Reflection (6:30 to 9:30) -->
+    <linearGradient id="bottomLeftArc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.85"/>
+      <stop offset="45%" stop-color="#fbbf24" stop-opacity="0.9"/>
+      <stop offset="78%" stop-color="#ecfeff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#67e8f9" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <!-- Crisp Icy Cyan / White Fresnel Glass Edge -->
+    <radialGradient id="fresnelEdge" cx="50%" cy="50%" r="50%">
+      <stop offset="86%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="94%" stop-color="#67e8f9" stop-opacity="0.54"/>
+      <stop offset="98.5%" stop-color="#ecfeff" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.98"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3.4"/>
+    </filter>
+
+    <filter id="wideGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5.2"/>
+    </filter>
+  </defs>
+
+  <!-- Deep Obsidian Squircle Background -->
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="#040407"/>
+  <rect x="1" y="1" width="126" height="126" rx="27" fill="none" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1.5"/>
+
+  <!-- Subtle Outer Ambient Glow -->
+  <circle cx="64" cy="64" r="58" fill="url(#outerAura)"/>
+
+  <!-- Thin-Film Soap Bubble Orb -->
+  <g clip-path="url(#bubbleClip)">
+    <!-- Pitch-Black Bubble Interior -->
+    <circle cx="64" cy="64" r="46" fill="#010103"/>
+
+    <!-- 1. Primary Warm Golden-Amber & Tangerine Right Crescent -->
+    <path d="M 68 25 A 39 39 0 0 1 91 94" fill="none" stroke="url(#amberCrescent)" stroke-width="12" stroke-linecap="round" filter="url(#wideGlow)"/>
+    <path d="M 66 24 A 40 40 0 0 1 94 91" fill="none" stroke="url(#amberCrescent)" stroke-width="6.5" stroke-linecap="round" filter="url(#softGlow)"/>
+
+    <!-- 2. Top-Left White -> Cream Gold -> Violet Iridescent Film -->
+    <path d="M 28 58 A 37 37 0 0 1 78 27" fill="none" stroke="url(#violetBand)" stroke-width="9.5" stroke-linecap="round" filter="url(#softGlow)"/>
+    <path d="M 26 56 A 40 40 0 0 1 80 26" fill="none" stroke="url(#topFilm)" stroke-width="5.2" stroke-linecap="round" filter="url(#softGlow)"/>
+    <path d="M 30 47 A 42 42 0 0 1 72 23.5" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-opacity="0.95"/>
+
+    <!-- 3. Bottom-Left Warm Amber & Icy Cyan Reflection -->
+    <path d="M 25 68 A 40 40 0 0 0 58 103" fill="none" stroke="url(#bottomLeftArc)" stroke-width="6.5" stroke-linecap="round" filter="url(#softGlow)"/>
+    <path d="M 23.5 70 A 42 42 0 0 0 54 104" fill="none" stroke="#ecfeff" stroke-width="2.2" stroke-linecap="round" stroke-opacity="0.92"/>
+
+    <!-- Deep Pitch-Black Core Vignette -->
+    <circle cx="64" cy="64" r="42" fill="url(#voidCore)"/>
+
+    <!-- Stationary Outer Icy Cyan / White Fresnel Glass Edge -->
+    <circle cx="64" cy="64" r="46" fill="url(#fresnelEdge)"/>
+  </g>
+
+  <!-- Subtle Liquid Bubble Rim Contour (Top-Right) -->
+  <path d="M 80 25.5 A 42.5 42.5 0 0 1 103 48" fill="none" stroke="#67e8f9" stroke-width="1.4" stroke-linecap="round" stroke-opacity="0.72"/>
+</svg>

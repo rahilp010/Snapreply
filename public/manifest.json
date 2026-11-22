@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "SnapReply — AI Reply & Writing Companion",
+  "version": "1.0.0",
+  "description": "Context-aware AI writing companion. Draft intelligent replies, rewrites, explanations, and summaries without leaving your tab.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Open SnapReply"
+  },
+  "options_ui": {
+    "page": "options/index.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "clipboardWrite"
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "MacCtrl+Shift+P"
+      },
+      "description": "Open SnapReply popup"
+    },
+    "reply_selected": {
+      "suggested_key": {
+        "default": "Alt+Shift+R",
+        "mac": "MacCtrl+Shift+R"
+      },
+      "description": "Reply to selected text with SnapReply"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/content.css",
+        "icons/*",
+        "onboarding/index.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
