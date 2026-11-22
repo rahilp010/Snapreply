@@ -1,7 +1,7 @@
 # SnapReply — AI Reply & Context-Aware Writing Companion
 
 <p align="center">
-  <img src="public/icons/icon128.png" width="96" height="96" alt="SnapReply Logo" />
+  <img src="public/icons/icon.svg" width="96" height="96" alt="SnapReply Logo" />
 </p>
 
 <p align="center">
