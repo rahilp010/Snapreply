@@ -1,6 +1,7 @@
 // src/shared/providers/index.ts
 import { GenerateRequest, GenerateResponse, UserSettings, ProviderType } from '../types';
 import { mockGenerate } from './mock';
+import { nararouterGenerate } from './nararouter';
 import { openAIGenerate } from './openai';
 import { geminiGenerate } from './gemini';
 import { anthropicGenerate } from './anthropic';
@@ -13,6 +14,8 @@ export async function generateContent(
   const provider = settings.provider || 'mock';
 
   switch (provider) {
+    case 'nararouter':
+      return nararouterGenerate(req, settings);
     case 'openai':
       return openAIGenerate(req, settings);
     case 'gemini':

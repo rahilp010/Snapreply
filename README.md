@@ -67,6 +67,7 @@ Select Message ➔ Choose Intent / Tone ➔ Generate Draft ➔ Review & Edit ➔
 - 🛡️ **Zero Host Page Style Pollution**: The in-page floating bubble and overlay panel render inside a secure **Shadow DOM** (`#snapreply-host`), ensuring web pages can never break SnapReply's glassmorphic styling.
 - ⚡ **Safe Text Insertion**: Intelligently inserts text into `<input>`, `<textarea>`, and rich `contenteditable` editors while preserving your undo/redo history. If insertion is unsupported or read-only, it automatically falls back to copying to your clipboard with friendly feedback.
 - 🔑 **Multi-Provider AI Engine (BYOK + Demo Mode)**:
+  - **NaraRouter (Bynara)**: High-speed, humanized AI routing via `https://router.bynara.id/v1/chat/completions` (model: `auto/bynara`).
   - **Built-in Demo Mode**: Instant, realistic, offline-capable responses out of the box with zero API key configuration!
   - **OpenAI**: Support for `gpt-4o-mini`, `gpt-4o`, `gpt-3.5-turbo`.
   - **Google Gemini**: Support for `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-2.0-flash`.

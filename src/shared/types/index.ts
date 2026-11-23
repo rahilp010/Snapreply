@@ -21,13 +21,14 @@ export type TonePreset =
 
 export type ResponseLength = 'short' | 'balanced' | 'detailed';
 
-export type ProviderType = 'mock' | 'openai' | 'gemini' | 'anthropic' | 'custom';
+export type ProviderType = 'mock' | 'nararouter' | 'openai' | 'gemini' | 'anthropic' | 'custom';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface UserSettings {
   provider: ProviderType;
   apiKeys: {
+    nararouter: string;
     openai: string;
     gemini: string;
     anthropic: string;
@@ -36,6 +37,7 @@ export interface UserSettings {
   customEndpoint: string;
   customModel: string;
   selectedModels: {
+    nararouter?: string;
     openai: string;
     gemini: string;
     anthropic: string;

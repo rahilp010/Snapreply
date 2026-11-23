@@ -18,6 +18,7 @@ import { UserSettings, ProviderType, TonePreset } from '../shared/types';
 import { getSettings, saveSettings } from '../shared/storage';
 import { generateContent } from '../shared/providers';
 import { ChromaticOrb } from '../shared/components/ChromaticOrb';
+import { ModelIcon } from '../shared/components/ModelIcon';
 
 export const OnboardingApp: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -81,7 +82,7 @@ export const OnboardingApp: React.FC = () => {
     if (!settings) return;
     const updatedKeys = { ...settings.apiKeys };
     if (selectedProvider !== 'mock' && selectedProvider !== 'custom') {
-      updatedKeys[selectedProvider as 'openai' | 'gemini' | 'anthropic'] = apiKey;
+      updatedKeys[selectedProvider as keyof typeof updatedKeys] = apiKey;
     }
 
     await saveSettings({
@@ -281,6 +282,28 @@ export const OnboardingApp: React.FC = () => {
 
             <div className="space-y-3 pt-1">
               <div
+                onClick={() => setSelectedProvider('nararouter')}
+                className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                  selectedProvider === 'nararouter'
+                    ? 'border-white/40 bg-white/[0.09] shadow-sm ring-1 ring-white/20'
+                    : 'border-white/[0.08] hover:border-white/20 bg-white/[0.03]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-xs text-white flex items-center gap-2">
+                    <ModelIcon provider="nararouter" size={18} />
+                    NaraRouter (auto/bynara)
+                  </span>
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">
+                    Real & Humanized
+                  </span>
+                </div>
+                <p className="text-xs text-white/50">
+                  Fast, intelligent AI routing for natural, authentic conversational replies.
+                </p>
+              </div>
+
+              <div
                 onClick={() => setSelectedProvider('mock')}
                 className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                   selectedProvider === 'mock'
@@ -289,7 +312,8 @@ export const OnboardingApp: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-xs text-white">
+                  <span className="font-semibold text-xs text-white flex items-center gap-2">
+                    <ModelIcon provider="mock" size={18} />
                     Built-in Demo Engine (Fastest)
                   </span>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
@@ -310,7 +334,8 @@ export const OnboardingApp: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-xs text-white">
+                  <span className="font-semibold text-xs text-white flex items-center gap-2">
+                    <ModelIcon provider="openai" size={18} />
                     OpenAI (GPT-4o-mini / GPT-4o)
                   </span>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.08] text-white/70">
@@ -331,7 +356,8 @@ export const OnboardingApp: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-xs text-white">
+                  <span className="font-semibold text-xs text-white flex items-center gap-2">
+                    <ModelIcon provider="gemini" size={18} />
                     Google Gemini (1.5 Flash)
                   </span>
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.08] text-white/70">

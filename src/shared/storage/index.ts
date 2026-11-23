@@ -2,8 +2,9 @@
 import { UserSettings, HistoryItem } from '../types';
 
 export const DEFAULT_SETTINGS: UserSettings = {
-  provider: 'mock', // Out-of-the-box working demo mode
+  provider: 'nararouter', // NaraRouter (auto/bynara) as default for real & humanized answers
   apiKeys: {
+    nararouter: '',
     openai: '',
     gemini: '',
     anthropic: '',
@@ -12,6 +13,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   customEndpoint: 'http://localhost:11434/v1',
   customModel: 'llama3:latest',
   selectedModels: {
+    nararouter: 'auto/bynara',
     openai: 'gpt-4o-mini',
     gemini: 'gemini-1.5-flash',
     anthropic: 'claude-3-5-haiku-20241022',
@@ -42,7 +44,13 @@ export async function getSettings(): Promise<UserSettings> {
     return new Promise((resolve) => {
       chrome.storage.local.get([SETTINGS_KEY], (result) => {
         if (result && result[SETTINGS_KEY]) {
-          resolve({ ...DEFAULT_SETTINGS, ...result[SETTINGS_KEY] });
+          const stored = result[SETTINGS_KEY];
+          resolve({
+            ...DEFAULT_SETTINGS,
+            ...stored,
+            apiKeys: { ...DEFAULT_SETTINGS.apiKeys, ...(stored.apiKeys || {}) },
+            selectedModels: { ...DEFAULT_SETTINGS.selectedModels, ...(stored.selectedModels || {}) },
+          });
         } else {
           resolve(DEFAULT_SETTINGS);
         }
@@ -53,7 +61,15 @@ export async function getSettings(): Promise<UserSettings> {
   // Fallback to localStorage
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        ...DEFAULT_SETTINGS,
+        ...parsed,
+        apiKeys: { ...DEFAULT_SETTINGS.apiKeys, ...(parsed.apiKeys || {}) },
+        selectedModels: { ...DEFAULT_SETTINGS.selectedModels, ...(parsed.selectedModels || {}) },
+      };
+    }
   } catch {
     // Ignore error
   }

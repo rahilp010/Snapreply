@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   ChevronLeft,
+  Key,
 } from 'lucide-react';
 import '../styles/globals.css';
 import {
@@ -33,6 +34,7 @@ import {
 } from '../shared/types';
 import {
   getSettings,
+  saveSettings,
   getHistory,
   addHistoryItem,
   clearHistory,
@@ -41,6 +43,7 @@ import { SUPPORTED_LANGUAGES, isQuestionText } from '../shared/prompts';
 import { generateContent } from '../shared/providers';
 import { copyToClipboard } from '../shared/utils/clipboard';
 import { ChromaticOrb } from '../shared/components/ChromaticOrb';
+import { ModelBadge } from '../shared/components/ModelIcon';
 
 declare const chrome: any;
 
@@ -66,7 +69,9 @@ export const PopupApp: React.FC = () => {
 
   // History state
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [inlineApiKey, setInlineApiKey] = useState('');
   const toneMenuRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-dismiss floating toast
   useEffect(() => {
@@ -314,11 +319,18 @@ export const PopupApp: React.FC = () => {
   };
 
   const isQuestion = isQuestionText(contextText);
-  const providerBadge = isQuestion
-    ? '⚡ Question Answering'
-    : !settings?.provider || settings.provider === 'mock'
-    ? 'BETA'
-    : settings.provider;
+  const activeModelName =
+    settings?.provider === 'nararouter'
+      ? settings?.selectedModels?.nararouter || 'auto/bynara'
+      : settings?.provider === 'openai'
+      ? settings?.selectedModels?.openai || 'gpt-4o-mini'
+      : settings?.provider === 'gemini'
+      ? settings?.selectedModels?.gemini || 'gemini-1.5-flash'
+      : settings?.provider === 'anthropic'
+      ? settings?.selectedModels?.anthropic || 'claude-3-5-haiku'
+      : settings?.provider === 'custom'
+      ? settings?.customModel || 'Local Model'
+      : undefined;
 
   return (
     <div
@@ -375,20 +387,31 @@ export const PopupApp: React.FC = () => {
         /* Dynamic Island Glass Capsule + Running Thin-Film Border */
         .sr-capsule-modern {
           position: relative;
+          border-radius: 9999px;
+          overflow: hidden;
           background: rgba(255, 255, 255, 0.045);
           backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
           border: 1px solid rgba(255, 255, 255, 0.11);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 20px -6px rgba(0, 0, 0, 0.65);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          cursor: text;
+        }
+        .sr-capsule-modern:hover {
+          border-color: rgba(255, 255, 255, 0.22);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 24px -6px rgba(0, 0, 0, 0.75);
         }
         .sr-capsule-modern::before {
           content: '';
           position: absolute;
-          inset: -1px;
-          border-radius: inherit;
-          padding: 1.3px;
+          top: 50%;
+          left: 50%;
+          width: 520px;
+          height: 520px;
+          margin-top: -260px;
+          margin-left: -260px;
+          border-radius: 50%;
           background: conic-gradient(
-            from var(--sr-angle),
             transparent 10%,
             #67e8f9 28%,
             #fbbf24 50%,
@@ -396,13 +419,22 @@ export const PopupApp: React.FC = () => {
             #c084fc 85%,
             transparent 95%
           );
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
+          animation: sr-capsule-spin 2.4s linear infinite;
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.3s ease;
-          animation: sr-border-rotate 2.4s linear infinite;
+          transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          z-index: 0;
+        }
+        .sr-capsule-modern::after {
+          content: '';
+          position: absolute;
+          inset: 1.2px;
+          border-radius: 9999px;
+          background: #09090f;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          pointer-events: none;
+          z-index: 1;
+          transition: background 0.3s ease;
         }
         .sr-capsule-modern:focus-within::before,
         .sr-capsule-modern.is-generating::before {
@@ -410,7 +442,22 @@ export const PopupApp: React.FC = () => {
         }
         .sr-capsule-modern.is-generating {
           background: rgba(251, 191, 36, 0.05);
-          box-shadow: 0 0 22px -4px rgba(251, 191, 36, 0.25);
+          box-shadow: 0 0 22px -4px rgba(251, 191, 36, 0.28);
+        }
+        .sr-capsule-modern.is-generating::after {
+          background: #0c0b11;
+        }
+        .sr-capsule-modern > * {
+          position: relative;
+          z-index: 2;
+        }
+        @keyframes sr-capsule-spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         /* Thin Glass Scrollbar */
@@ -443,18 +490,14 @@ export const PopupApp: React.FC = () => {
 
       {/* 1. Header Bar (h-12 / 48px) */}
       <header className="relative z-20 h-12 px-4 flex items-center justify-between border-b border-white/[0.08] bg-white/[0.025] backdrop-blur-xl shrink-0">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <ChromaticOrb size={24} isGenerating={isLoading} />
           <span className="font-semibold text-sm tracking-tight text-white/95">SnapReply</span>
-          <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border tracking-wider transition-all duration-300 ${
-              providerBadge === 'BETA'
-                ? 'bg-gradient-to-r from-amber-500/15 via-cyan-500/15 to-purple-500/15 text-amber-200/95 border-amber-300/25 shadow-[0_0_12px_rgba(251,191,36,0.12)]'
-                : 'bg-white/[0.08] text-white/80 border-white/12 capitalize'
-            }`}
-          >
-            {providerBadge}
-          </span>
+          <ModelBadge
+            provider={settings?.provider}
+            modelName={activeModelName}
+            onClick={openOptions}
+          />
         </div>
 
         {/* Segmented Tab Switcher (Composer <-> History) */}
@@ -527,6 +570,51 @@ export const PopupApp: React.FC = () => {
               : 'opacity-0 -translate-x-6 pointer-events-none scale-[0.98]'
           }`}
         >
+          {/* NaraRouter Quick Key Setup Banner */}
+          {settings?.provider === 'nararouter' && !settings?.apiKeys?.nararouter && (
+            <div className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 shrink-0 space-y-1.5 animate-slide-down">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-amber-300 flex items-center gap-1.5">
+                  <Key className="w-3 h-3 text-amber-400" />
+                  NaraRouter API Key Needed
+                </span>
+                <button
+                  onClick={openOptions}
+                  className="text-[10px] text-white/60 hover:text-white underline cursor-pointer"
+                >
+                  Options
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="password"
+                  value={inlineApiKey}
+                  onChange={(e) => setInlineApiKey(e.target.value)}
+                  placeholder="Paste Bearer token here..."
+                  className="flex-1 text-[11px] px-2.5 py-1 rounded-xl border border-white/15 bg-black/80 font-mono text-white placeholder:text-white/30 focus:outline-hidden"
+                />
+                <button
+                  onClick={async () => {
+                    if (inlineApiKey.trim()) {
+                      const updated = await saveSettings({
+                        apiKeys: {
+                          ...settings.apiKeys,
+                          nararouter: inlineApiKey.trim(),
+                        },
+                      });
+                      setSettings(updated);
+                      setToastMsg({ text: 'NaraRouter key saved!', type: 'success' });
+                    }
+                  }}
+                  disabled={!inlineApiKey.trim()}
+                  className="px-2.5 py-1 rounded-xl bg-white text-black font-semibold text-[10px] hover:bg-white/90 disabled:opacity-40 cursor-pointer"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 2. Context Card */}
           <div className="bg-white/[0.038] hover:bg-white/[0.048] focus-within:bg-white/[0.055] focus-within:border-white/20 rounded-2xl p-2.5 border border-white/[0.08] transition-all duration-200 shrink-0">
             <div className="flex items-center justify-between text-[11px] text-white/50 mb-1 select-none">
@@ -697,12 +785,14 @@ export const PopupApp: React.FC = () => {
 
             {/* 4. Dynamic Island Capsule Input */}
             <div
+              onClick={() => inputRef.current?.focus()}
               className={`sr-capsule-modern h-11 px-3 rounded-full flex items-center gap-2.5 shrink-0 ${
                 isLoading ? 'is-generating' : ''
               }`}
             >
               <ChromaticOrb size={22} isGenerating={isLoading} />
               <input
+                ref={inputRef}
                 type="text"
                 value={userIntent}
                 onChange={(e) => setUserIntent(e.target.value)}

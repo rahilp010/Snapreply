@@ -184,49 +184,89 @@ export const FloatingOrbWidget: React.FC<FloatingOrbWidgetProps> = ({
           </div>
         )}
 
-        {/* Main Draggable Circular Obsidian Orb */}
-        <div
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handlePointerDown(e.clientX, e.clientY);
-          }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-            const t = e.touches[0];
-            handlePointerDown(t.clientX, t.clientY);
-          }}
-          style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '9999px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(8, 8, 12, 0.95)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: hasSelection
-              ? '1px solid rgba(255, 59, 48, 0.85)'
-              : isOverlayOpen
-              ? '1px solid rgba(251, 191, 36, 0.65)'
-              : '1px solid rgba(255, 255, 255, 0.22)',
-            boxShadow: hasSelection
-              ? '0 0 24px rgba(255, 59, 48, 0.55), 0 10px 32px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
-              : isOverlayOpen
-              ? '0 0 20px rgba(251, 191, 36, 0.35), 0 10px 32px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-              : '0 8px 28px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.16)',
-            cursor: isDragging ? 'grabbing' : 'grab',
-            transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease',
-            userSelect: 'none',
-          }}
-          className={`relative transition-all duration-200 select-none ${
-            hasSelection ? 'scale-105' : 'hover:scale-105 active:scale-95'
-          }`}
-          title={tooltipText}
-          role="button"
-          tabIndex={0}
-        >
+      <style>{`
+        @property --sr-angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+        @keyframes sr-border-rotate {
+          to { --sr-angle: 360deg; }
+        }
+        .sr-orb-glow {
+          position: relative;
+        }
+        .sr-orb-glow::before {
+          content: '';
+          position: absolute;
+          inset: -1.5px;
+          border-radius: 9999px;
+          padding: 1.5px;
+          background: conic-gradient(
+            from var(--sr-angle),
+            rgba(103, 232, 249, 0.85),
+            rgba(251, 191, 36, 0.85),
+            rgba(249, 115, 22, 0.85),
+            rgba(192, 132, 252, 0.85),
+            rgba(103, 232, 249, 0.85)
+          );
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          animation: sr-border-rotate 2.8s linear infinite;
+        }
+        .sr-orb-glow:hover::before,
+        .sr-orb-active::before {
+          opacity: 1;
+        }
+      `}</style>
+
+      {/* Main Draggable Circular Obsidian Orb */}
+      <div
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handlePointerDown(e.clientX, e.clientY);
+        }}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+          const t = e.touches[0];
+          handlePointerDown(t.clientX, t.clientY);
+        }}
+        style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '9999px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: hasSelection
+            ? '1px solid rgba(255, 59, 48, 0.85)'
+            : isOverlayOpen
+            ? '1px solid rgba(251, 191, 36, 0.65)'
+            : '1px solid rgba(255, 255, 255, 0.22)',
+          boxShadow: hasSelection
+            ? '0 0 24px rgba(255, 59, 48, 0.55), 0 10px 32px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25)'
+            : isOverlayOpen
+            ? '0 0 20px rgba(251, 191, 36, 0.35), 0 10px 32px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            : '0 8px 28px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.16)',
+          cursor: isDragging ? 'grabbing' : 'grab',
+          transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease',
+          userSelect: 'none',
+        }}
+        className={`sr-orb-glow relative transition-all duration-200 select-none ${
+          hasSelection || isOverlayOpen ? 'sr-orb-active scale-105' : 'hover:scale-105 active:scale-95'
+        }`}
+        title={tooltipText}
+        role="button"
+        tabIndex={0}
+      >
           {/* Animated Chromatic Liquid Orb */}
           <ChromaticOrb size={28} isGenerating={hasSelection && isQuestion} />
 

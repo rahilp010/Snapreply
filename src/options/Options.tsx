@@ -31,6 +31,7 @@ import {
 import { testProviderConnection, generateContent } from '../shared/providers';
 import { SUPPORTED_LANGUAGES } from '../shared/prompts';
 import { ChromaticOrb } from '../shared/components/ChromaticOrb';
+import { ModelIcon } from '../shared/components/ModelIcon';
 
 type ActiveTab = 'providers' | 'preferences' | 'privacy' | 'shortcuts' | 'playground';
 
@@ -188,6 +189,12 @@ export const OptionsApp: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   {
+                    id: 'nararouter',
+                    name: 'NaraRouter (Bynara)',
+                    desc: 'Fast AI router (auto/bynara) with natural, humanized replies. Direct endpoint.',
+                    badge: 'Real & Humanized',
+                  },
+                  {
                     id: 'mock',
                     name: 'Built-in Demo Mode',
                     desc: 'Instant, realistic, offline-capable responses. Zero API key required.',
@@ -230,7 +237,8 @@ export const OptionsApp: React.FC = () => {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-semibold text-xs text-white">
+                        <span className="font-semibold text-xs text-white flex items-center gap-2">
+                          <ModelIcon provider={prov.id} size={18} />
                           {prov.name}
                         </span>
                         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/[0.08] text-white/70">
@@ -258,7 +266,9 @@ export const OptionsApp: React.FC = () => {
                         <span>API Key</span>
                         <a
                           href={
-                            settings.provider === 'openai'
+                            settings.provider === 'nararouter'
+                              ? 'https://router.bynara.id'
+                              : settings.provider === 'openai'
                               ? 'https://platform.openai.com/api-keys'
                               : settings.provider === 'gemini'
                               ? 'https://aistudio.google.com/app/apikey'
@@ -268,13 +278,13 @@ export const OptionsApp: React.FC = () => {
                           rel="noreferrer"
                           className="text-xs text-white/70 hover:text-white flex items-center gap-1 transition-colors"
                         >
-                          Get API Key <ExternalLink className="w-3 h-3" />
+                          {settings.provider === 'nararouter' ? 'NaraRouter Portal' : 'Get API Key'} <ExternalLink className="w-3 h-3" />
                         </a>
                       </label>
                       <div className="relative">
                         <input
                           type={showApiKey ? 'text' : 'password'}
-                          value={settings.apiKeys[settings.provider as 'openai' | 'gemini' | 'anthropic'] || ''}
+                          value={settings.apiKeys[settings.provider as keyof typeof settings.apiKeys] || ''}
                           onChange={(e) => {
                             const newKeys = {
                               ...settings.apiKeys,
@@ -282,7 +292,11 @@ export const OptionsApp: React.FC = () => {
                             };
                             updateSetting('apiKeys', newKeys);
                           }}
-                          placeholder={`Enter your ${settings.provider} API key...`}
+                          placeholder={
+                            settings.provider === 'nararouter'
+                              ? 'Paste your NaraRouter API key (Bearer token)...'
+                              : `Enter your ${settings.provider} API key...`
+                          }
                           className="w-full text-xs px-3.5 py-2.5 pr-10 rounded-2xl border border-white/12 bg-black/70 font-mono text-white placeholder:text-white/30 focus:border-white/35 focus:outline-hidden"
                         />
                         <button
@@ -294,7 +308,9 @@ export const OptionsApp: React.FC = () => {
                         </button>
                       </div>
                       <p className="text-[11px] text-white/40">
-                        Stored strictly in local Chrome storage. Never sent to any telemetry servers.
+                        {settings.provider === 'nararouter'
+                          ? 'Calls https://router.bynara.id/v1/chat/completions directly. Stored securely in local Chrome storage.'
+                          : 'Stored strictly in local Chrome storage. Never sent to any telemetry servers.'}
                       </p>
                     </div>
                   )}
@@ -333,6 +349,27 @@ export const OptionsApp: React.FC = () => {
                   )}
 
                   {/* Model Selector */}
+                  {settings.provider === 'nararouter' && (
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-white/70">
+                        NaraRouter Model
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.selectedModels.nararouter || 'auto/bynara'}
+                        onChange={(e) => {
+                          const updated = { ...settings.selectedModels, nararouter: e.target.value };
+                          updateSetting('selectedModels', updated);
+                        }}
+                        placeholder="auto/bynara"
+                        className="w-full text-xs px-3.5 py-2.5 rounded-2xl border border-white/12 bg-black/80 font-mono text-white focus:outline-hidden"
+                      />
+                      <p className="text-[11px] text-white/40">
+                        Endpoint: https://router.bynara.id/v1/chat/completions (Default: auto/bynara).
+                      </p>
+                    </div>
+                  )}
+
                   {settings.provider === 'openai' && (
                     <div className="space-y-1">
                       <label className="text-xs font-medium text-white/70">

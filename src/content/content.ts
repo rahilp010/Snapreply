@@ -52,6 +52,24 @@ class SnapReplyContentApp {
       return;
     }
 
+    // Register @property --sr-angle in document scope if supported and not already added
+    try {
+      if (typeof document !== 'undefined' && !document.getElementById('snapreply-angle-defs')) {
+        const style = document.createElement('style');
+        style.id = 'snapreply-angle-defs';
+        style.textContent = `
+          @property --sr-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: true;
+          }
+        `;
+        (document.head || document.documentElement).appendChild(style);
+      }
+    } catch {
+      // Ignored if CSP restricts inline styles
+    }
+
     this.shadowHost = document.createElement('div');
     this.shadowHost.id = 'snapreply-host';
     this.shadowHost.style.position = 'fixed';
@@ -105,7 +123,7 @@ class SnapReplyContentApp {
     // Safely append to document body or documentElement
     const mountHost = () => {
       const parent = document.body || document.documentElement;
-      if (parent && !parent.contains(this.shadowHost)) {
+      if (parent && this.shadowHost && !parent.contains(this.shadowHost)) {
         parent.appendChild(this.shadowHost);
       }
     };
